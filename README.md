@@ -5,6 +5,7 @@ Script para obtener registros unificados de logs de firewalls Checkpoint
 # Descripción
 Script para obtener registros unificados de log de firewalls Checkpoint a través de  Secure Server o  Multi-domain server.
 Genera un CSV a partir de la unificación de los registros de log agrupándolos por Ip de origen.
+
 Esta testado sobre R80.10.
 ![alt text](https://github.com/amerinoj/checkpoint-unified-records/blob/master/img/Example.png?raw=true)
 
@@ -68,7 +69,8 @@ Log files find ...
 Options: 
 ```
 
-Op:1 Selección de ficheros LOG
+Op:1 Selección de ficheros LOG.
+
 Ir marcando el número de los ficheros log que se quieren procesar, después marcar el numero donde ponga 'Go back' para volver al menú principal.
 ```
  1) 2020-02-22_000000.log    5) 2020-04-19_000000.log
@@ -77,7 +79,8 @@ Ir marcando el número de los ficheros log que se quieren procesar, después mar
  4) 2020-02-25_000000.log    8) Go back
  ```
 
-Op:2  Ip de gestión del Gateway
+Op:2  Ip de gestión del Gateway.
+
 Introducir la Ip de gestión del Gateway para filtrar la búsqueda, si se omite no se utilizará este filtro;
 ```
 Intro managemet Gateway Ip or object name
@@ -85,7 +88,8 @@ Press intro to select any
 gateway : 10.0.0.1
 ```
 
-Op:3  Ip/red de host
+Op:3  Ip/red de host.
+
 Introducir la Ip del host para realizar el filtrado en la búsqueda. 
 El script obtendrá cualquier trafico logado con origen o destino a esta Ip.
 Si se quiere utilizar una red entera, el filtrado se realizará en modo texto.
@@ -102,7 +106,8 @@ Press intro to select any
 host Ip : 10.
 ```
 
-Op:4  Nombre del cluster
+Op:4  Nombre del cluster.
+
 Introducir el nombre del cluster de los firewalls para realizar el filtrado.
 Ej: FWCPD =FWCPD1,FWCPD2,FWCPD3 
 ```
@@ -112,7 +117,7 @@ Press intro to select any
 cluster name : FWCPD
 ```
 
-Op:5 Estado de la maquina
+Op:5 Estado de la maquina.
 
 Muestra estadísticas globales de uso de CPU, MEMORIA y DISCO. 
 También muestra los procesos relacionados con la ejecución de este script y el espacio utilizado en la creación de ficheros temporales.
@@ -141,7 +146,7 @@ Size:6          Date:Jun 8 18:40      Name:/home/admin/find_log_tmp/find_log.pid
 ```
 
 
-Op:6 Ejecución
+Op:6 Ejecución.
 
 Muestra los parámetros con los que va a realizar el filtrado, si se está de acuerdo, pulsar 'y'
 ```
@@ -164,6 +169,7 @@ Are you sure? [y/N] :
 ```
 
 Realizando el filtrado.
+
 Si el script está encontrando registros que concuerdan con los parámetros introducidos el tamaño de los ficheros ‘.flt’ irá aumentando y se generaran ficheros  ‘ .unq’
 ```
 Execution time:[ 0 minutes 0 seconds]
@@ -197,7 +203,7 @@ Size:6          Date:Jun 8 19:00      Name:/home/admin/find_log_tmp/find_log_job
 Size:6          Date:Jun 8 19:00      Name:/home/admin/find_log_tmp/find_log.pid 
 ```
 
-Cuando el script termine creará un fichero '.csv' con los registros finales  .
+Cuando el script termine creará un fichero '.csv' con los registros finales.
 ```
 ---------------------------------------------------------------
 Execution time: 76 minutes 44 seconds

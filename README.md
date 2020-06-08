@@ -69,7 +69,7 @@ Log files find ...
 Options: 
 ```
 
-Op:1 Selección de ficheros LOG.
+- *Op:1 Selección de ficheros LOG.**
 
 Ir marcando el número de los ficheros log que se quieren procesar, después marcar el numero donde ponga 'Go back' para volver al menú principal.
 ```
@@ -79,7 +79,7 @@ Ir marcando el número de los ficheros log que se quieren procesar, después mar
  4) 2020-02-25_000000.log    8) Go back
  ```
 
-Op:2  Ip de gestión del Gateway.
+- *Op:2  Ip de gestión del Gateway.**
 
 Introducir la Ip de gestión del Gateway para filtrar la búsqueda, si se omite no se utilizará este filtro;
 ```
@@ -88,7 +88,7 @@ Press intro to select any
 gateway : 10.0.0.1
 ```
 
-Op:3  Ip/red de host.
+- *Op:3  Ip/red de host.**
 
 Introducir la Ip del host para realizar el filtrado en la búsqueda. 
 
@@ -96,11 +96,11 @@ El script obtendrá cualquier trafico logado con origen o destino a esta Ip.
 
 Si se quiere utilizar una red entera, el filtrado se realizará en modo texto.
 
-Ej:   10.   =10.0.0.0/8
-Ej:   10.0.   =10.0.0.0/16
-Ej:   10.2.   =10.2.0.0/16
-Ej:   132.16.   =132.16.0.0/16
-Ej:   132.16.50.1   =132.16.50.1/24
+-Ej:   10.   =10.0.0.0/8
+-Ej:   10.0.   =10.0.0.0/16
+-Ej:   10.2.   =10.2.0.0/16
+-Ej:   132.16.   =132.16.0.0/16
+-Ej:   132.16.50.1   =132.16.50.1/24
 ```
 Intro the host Ip to filter the search
 The query will try to find any traffic from or to this host
@@ -109,7 +109,7 @@ Press intro to select any
 host Ip : 10.
 ```
 
-Op:4  Nombre del cluster.
+- *Op:4  Nombre del cluster.**
 
 Introducir el nombre del cluster de los firewalls para realizar el filtrado.
 
@@ -121,7 +121,7 @@ Press intro to select any
 cluster name : FWCPD
 ```
 
-Op:5 Estado de la maquina.
+- *Op:5 Estado de la maquina.**
 
 Muestra estadísticas globales de uso de CPU, MEMORIA y DISCO. 
 
@@ -151,7 +151,7 @@ Size:6          Date:Jun 8 18:40      Name:/home/admin/find_log_tmp/find_log.pid
 ```
 
 
-Op:6 Ejecución.
+- *Op:6 Ejecución.**
 
 Muestra los parámetros con los que va a realizar el filtrado, si se está de acuerdo, pulsar 'y'
 ```

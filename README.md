@@ -1,5 +1,6 @@
 # Checkpoint Unified Records
 Script para obtener registros unificados de logs de firewalls Checkpoint
+Esta testado sobre R80.10.
 -------
 
 # Descripción

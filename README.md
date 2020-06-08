@@ -1,4 +1,4 @@
-# Checkpoint-_find_log
+# Checkpoint unified records
 Script para obtener registros unificados de logs de firewalls Checkpoint
 -------
 

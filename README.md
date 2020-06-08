@@ -1,4 +1,4 @@
-# Checkpoint unified records
+# Checkpoint Unified Records
 Script para obtener registros unificados de logs de firewalls Checkpoint
 -------
 

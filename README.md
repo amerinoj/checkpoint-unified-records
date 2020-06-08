@@ -91,8 +91,11 @@ gateway : 10.0.0.1
 Op:3  Ip/red de host.
 
 Introducir la Ip del host para realizar el filtrado en la búsqueda. 
+
 El script obtendrá cualquier trafico logado con origen o destino a esta Ip.
+
 Si se quiere utilizar una red entera, el filtrado se realizará en modo texto.
+
 Ej:   10.   =10.0.0.0/8
 Ej:   10.0.   =10.0.0.0/16
 Ej:   10.2.   =10.2.0.0/16
@@ -109,6 +112,7 @@ host Ip : 10.
 Op:4  Nombre del cluster.
 
 Introducir el nombre del cluster de los firewalls para realizar el filtrado.
+
 Ej: FWCPD =FWCPD1,FWCPD2,FWCPD3 
 ```
 Intro the Origin cluster name to filter the search or use a pattern
@@ -120,6 +124,7 @@ cluster name : FWCPD
 Op:5 Estado de la maquina.
 
 Muestra estadísticas globales de uso de CPU, MEMORIA y DISCO. 
+
 También muestra los procesos relacionados con la ejecución de este script y el espacio utilizado en la creación de ficheros temporales.
 ```
 ######################## Global CPU ##########################

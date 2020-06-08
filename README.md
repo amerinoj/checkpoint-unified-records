@@ -96,11 +96,11 @@ El script obtendrá cualquier trafico logado con origen o destino a esta Ip.
 
 Si se quiere utilizar una red entera, el filtrado se realizará en modo texto.
 
--Ej:   10.   =10.0.0.0/8
--Ej:   10.0.   =10.0.0.0/16
--Ej:   10.2.   =10.2.0.0/16
--Ej:   132.16.   =132.16.0.0/16
--Ej:   132.16.50.1   =132.16.50.1/24
+- Ej:   10.   =10.0.0.0/8
+- Ej:   10.0.   =10.0.0.0/16
+- Ej:   10.2.   =10.2.0.0/16
+- Ej:   132.16.   =132.16.0.0/16
+- Ej:   132.16.50.1   =132.16.50.1/24
 ```
 Intro the host Ip to filter the search
 The query will try to find any traffic from or to this host

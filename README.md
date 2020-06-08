@@ -11,9 +11,9 @@ Genera un CSV a partir de la unificación de los registros de log agrupándolos 
 Descargar los ficheros 'find_log.sh' y 'find_log_job.sh' dentro del Secure Server o Multi-domain Server.
 
 ```
-[Expert@mds-secundario:0]# pwd
+[Expert@mds:0]# pwd
 /home/admin
-[Expert@mds-secundario:0]# ls find*
+[Expert@mds:0]# ls find*
 find_log.sh  find_log_job.sh
 ```
 Editar los parámetros 'Dns_server1' y 'Dns_server2' del fichero 'find_log_job.sh'y añadir la ips de los servidores DNS de la empresa.
@@ -52,7 +52,7 @@ sh find_log.sh
 
 Al ejecutar el script se creará un directorio temporal para ir almacenando los ficheros procesados. El directorio se creará dentro del path donde se esté ejecutando el script.
 ```
-[Expert@mds-secundario:0]# sh find_log.sh 
+[Expert@mds:0]# sh find_log.sh 
 /home/admin/find_log_tmp/
 Temporal directory exits /home/admin/find_log_tmp/...
 Using log path:/opt/CPmds-R80/log/
@@ -210,7 +210,7 @@ Final file : /home/admin/find_log_tmp/fwcpd_10.0.0.1_10._2020_06_08.csv
 
 Puede utilizar los parámetros de sobrecarga para pasar la ruta de los log al script ‘find_log.sh’
 ```
-[Expert@mds-secundario:0]# sh find_log.sh -h
+[Expert@mds:0]# sh find_log.sh -h
 
 ########### find_log ############
 Search unique traffic per servers  in checkpoint logs
@@ -230,7 +230,7 @@ sh find_log.sh -l /opt/CPmds-R80/customers/CMA2/CPsuite-R80/fw1/log/
 
 Se pueden pasar los parámetros de  filtrado directamente al script 'find_log_job.sh' . Pero si se pierde la sesión de ssh la aplicación se cerrará y se perderán los avances.
 ```
-[Expert@mds-secundario:0]# sh find_log_job.sh -h
+[Expert@mds:0]# sh find_log_job.sh -h
 Usage:
     find_log_job -h                      Display this help message.
     [-n]                                   Host or net Ip.
@@ -249,7 +249,7 @@ Usage:
 Solamente se permite la ejecución de una única instancia del script sobre el mismo path. Esto es para no sobrecargar la máquina.
 Si se detecta la ejecución de otra instancia el script no arrancará.
 ```
-[Expert@mds-secundario:0]# sh find_log.sh 
+[Expert@mds:0]# sh find_log.sh 
 /home/admin/find_log_tmp/
 Temporal directory exits /home/admin/find_log_tmp/...
 A other instance find_log is running ...
@@ -258,7 +258,7 @@ Instance find_log PID:20645
 
 Si se ha perdido la sesión de ssh al volver a ejecutar el script se permitirá volver a obtener el control del script.
 ```
-[Expert@mds-secundario:0]# sh find_log.sh 
+[Expert@mds:0]# sh find_log.sh 
 /home/admin/find_log_tmp/
 Temporal directory exits /home/admin/find_log_tmp/...
 A other instance find_log_job is running ...

@@ -4,10 +4,16 @@ Script para obtener registros unificados de logs de firewalls Checkpoint
 
 # Descripción
 Script para obtener registros unificados de log de firewalls Checkpoint a través de  Secure Server o  Multi-domain server.
-Genera un CSV a partir de la unificación de los registros de log agrupándolos por Ip de origen.
+
+Esto es útil para la depuración de las reglas del firewall y para comprobar si realmente las reglas se ajustan al trafico real o son más permisivas.
 
 Esta testado sobre R80.10.
+
+Ejemplo: Reglas de firewall type:accept
 ![alt text](https://github.com/amerinoj/checkpoint-unified-records/blob/master/img/Example.png?raw=true)
+
+Ejemplo: Reglas de IPS type:monitor
+![alt text](https://github.com/amerinoj/checkpoint-unified-records/blob/master/img/Example2.png)
 
 # Instalación
 Descargar los ficheros 'find_log.sh' y 'find_log_job.sh' dentro del Secure Server o Multi-domain Server.

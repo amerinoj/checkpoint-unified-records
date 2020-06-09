@@ -243,7 +243,7 @@ create_temp_dir
 
 if (test -f "$Tmp_dir$Pid_find_log_job"); then
 	if ps -p $(head -n 1 "$Tmp_dir$Pid_find_log_job") >/dev/null ; then
-		echo -e  "\e[1mA other instance find_log_job is running ...\e[21m"
+		echo -e  "\e[1mAnother instance find_log_job is running ...\e[21m"
 		echo -e  "\e[1mInstance find_log_job PID:$(head -n 1 "$Tmp_dir$Pid_find_log_job")\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
 		exit

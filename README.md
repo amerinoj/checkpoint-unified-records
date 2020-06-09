@@ -75,6 +75,7 @@ Log files find ...
 Options: 
 ```
 
+--------------------------------------------------------------------
 - *Op:1 Selección de ficheros LOG.**
 
 Ir marcando el número de los ficheros log que se quieren procesar, después marcar el numero donde ponga 'Go back' para volver al menú principal.
@@ -85,6 +86,7 @@ Ir marcando el número de los ficheros log que se quieren procesar, después mar
  4) 2020-02-25_000000.log    8) Go back
  ```
 
+--------------------------------------------------------------------
 - *Op:2  Ip de gestión del Gateway.**
 
 Introducir la Ip de gestión del Gateway para filtrar la búsqueda, si se omite no se utilizará este filtro;
@@ -94,6 +96,7 @@ Press intro to select any
 gateway : 10.0.0.1
 ```
 
+--------------------------------------------------------------------
 - *Op:3  Ip/red de host.**
 
 Introducir la Ip del host para realizar el filtrado en la búsqueda. 
@@ -115,6 +118,7 @@ Press intro to select any
 host Ip : 10.
 ```
 
+--------------------------------------------------------------------
 - *Op:4  Nombre del cluster.**
 
 Introducir el nombre del cluster de los firewalls para realizar el filtrado.
@@ -127,6 +131,7 @@ Press intro to select any
 cluster name : FWCPD
 ```
 
+--------------------------------------------------------------------
 - *Op:5 Estado de la maquina.**
 
 Muestra estadísticas globales de uso de CPU, MEMORIA y DISCO. 
@@ -157,6 +162,7 @@ Size:6          Date:Jun 8 18:40      Name:/home/admin/find_log_tmp/find_log.pid
 ```
 
 
+--------------------------------------------------------------------
 - *Op:6 Ejecución.**
 
 Muestra los parámetros con los que va a realizar el filtrado, si se está de acuerdo, pulsar 'y'
@@ -181,7 +187,7 @@ Are you sure? [y/N] :
 
 Realizando el filtrado.
 
-Si el script está encontrando registros que concuerdan con los parámetros introducidos el tamaño de los ficheros ‘.flt’ irá aumentando y se generaran ficheros  ‘ .unq’
+Si el script está encontrando registros que concuerdan con los parámetros introducidos el tamaño de los ficheros ‘.flt’ irá aumentando y se generarán ficheros  ‘ .unq’
 ```
 Execution time:[ 0 minutes 0 seconds]
 
@@ -262,7 +268,7 @@ Usage:
 ```
 
 
-#Persistencia de Sesión
+# Persistencia de Sesión
 
 Solamente se permite la ejecución de una única instancia del script sobre el mismo path. Esto es para no sobrecargar la máquina.
 Si se detecta la ejecución de otra instancia el script no arrancará.
@@ -270,7 +276,7 @@ Si se detecta la ejecución de otra instancia el script no arrancará.
 [Expert@mds:0]# sh find_log.sh 
 /home/admin/find_log_tmp/
 Temporal directory exits /home/admin/find_log_tmp/...
-A other instance find_log is running ...
+Another instance find_log is running ...
 Instance find_log PID:20645
 ```
 
@@ -279,8 +285,9 @@ Si se ha perdido la sesión de ssh al volver a ejecutar el script se permitirá 
 [Expert@mds:0]# sh find_log.sh 
 /home/admin/find_log_tmp/
 Temporal directory exits /home/admin/find_log_tmp/...
-A other instance find_log_job is running ...
+Another instance find_log_job is running ...
 Instance find_log_job PID:21025
 
 Do you want take the control? [y/N] :y
 ```
+

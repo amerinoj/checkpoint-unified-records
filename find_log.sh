@@ -124,7 +124,7 @@
 	printf "\n######################## Disk Use ############################\n\n"
 	printf "%s \n" "$L_Disk"
 	printf "_______________________________________________________________\n"
-	printf "Size:%-10s Date:%-2s %s %-10s Name:%-2s \n" $Fsize
+	printf "Size:%-5s Date:%-2s %s %-5s Name:%-2s \n" $Fsize
 
 	}
 

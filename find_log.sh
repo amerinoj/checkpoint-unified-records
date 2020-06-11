@@ -287,6 +287,8 @@
 		if ! [ -z "$subproces" ];then
 			Child_Pid+=($subproces)				
 			process_tree $subproces
+		else
+			process_tree $$
 		fi
 	}
 		

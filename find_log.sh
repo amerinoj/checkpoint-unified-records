@@ -393,7 +393,7 @@
 				else
 					if [[ 'Range' == $answer ]]; then
 						echo "____________________________________________"
-						echo "Intro de file range"
+						echo "Intro the file range"
 						echo "id1-id2"
 						read -p "File Range : " Range_File
 						if [[ ${Range_File} == *"-"* ]]; then

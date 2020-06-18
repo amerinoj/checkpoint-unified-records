@@ -133,7 +133,7 @@ Dns_server2="2.2.0.101"
 		echo ""
 		
 		echo "Trying to sort and remove duplicates in EndFile ${EndFile}.tmp  "
-		Command="gawk 'BEGIN{FS=OFS=\";\";} {a[\$1\$2\$3\$4\$5\$6\$7\$8\$9] += \$10} END{for (i in a) print i," Hits: \"a[i]}'  ${EndFile}.tmp > ${EndFile}.csv"
+		Command="gawk 'BEGIN{FS=OFS=\";\";} {a[\$1\";\"\$2\";\"\$3\";\"\$4\";\"\$5\";\"\$6\";\"\$7\";\"\$8\";\"\$9] += \$10} END{for (i in a) print i,\" Hits: \"a[i]}'  ${EndFile}.tmp > ${EndFile}.csv"
 		eval $Command
 
 		echo "Removing tmp file:  ${EndFile}.tmp"

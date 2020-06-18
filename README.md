@@ -69,25 +69,43 @@ Log files find ...
 
 ####################  Menu  options  ####################
 
-1) Filter:Select Files    4) Filter:Select Cluster  7) End
-2) Filter:Select Gateway  5) Machine Status
-3) Filter:Select Host     6) Execute
-Options: 
+1) Filter:Select Files         6) Filter:Select Host
+2) Filter:Select Gateway Ip    7) Machine Status
+3) Filter:Select Gateway Name  8) Execute
+4) Filter:Policy Name          9) End
+5) Filter:Rule Id
+
 ```
 
 --------------------------------------------------------------------
-- *Op:1 Selección de ficheros LOG.**
+- *Op:1 Filter:Select Files.**
 
 Ir marcando el número de los ficheros log que se quieren procesar, después marcar el numero donde ponga 'Go back' para volver al menú principal.
+
+Si se quiere seleccionar un rango de ficheros, primero introducir el numero donde pongo "Range".
 ```
- 1) 2020-02-22_000000.log    5) 2020-04-19_000000.log
- 2) 2020-02-23_000000.log    6) 2020-04-20_000000.log
- 3) 2020-02-24_000000.log    7) All
- 4) 2020-02-25_000000.log    8) Go back
+52) 2020-04-13_000000.log   114) 2020-06-14_000000.log
+53) 2020-04-14_000000.log   115) 2020-06-15_000000.log
+54) 2020-04-15_000000.log   116) 2020-06-16_000000.log
+55) 2020-04-16_000000.log   117) 2020-06-17_000000.log
+56) 2020-04-17_000000.log   118) 2020-06-18_000000.log
+57) 2020-04-18_000000.log   119) fw.log
+58) 2020-04-19_000000.log   120) ip_block_activate.log
+59) 2020-04-20_000000.log   121) lock_dbs.log
+60) 2020-04-21_000000.log   122) All
+61) 2020-04-22_000000.log   123) Range
+62) 2020-04-23_000000.log   124) Go back
+Select file: 123
+____________________________________________
+Intro de file range
+id1-id2
+File Range : 114-119
+From :114    To :119
+Files: 2020-06-14_000000.log 2020-06-15_000000.log 2020-06-16_000000.log 2020-06-17_000000.log 2020-06-18_000000.log fw.log
  ```
 
 --------------------------------------------------------------------
-- *Op:2  Ip de gestión del Gateway.**
+- *Op:2  Filter:Select Gateway Ip .**
 
 Introducir la Ip de gestión del Gateway para filtrar la búsqueda, si se omite no se utilizará este filtro;
 ```
@@ -97,9 +115,46 @@ gateway : 10.0.0.1
 ```
 
 --------------------------------------------------------------------
-- *Op:3  Ip/red de host.**
+- *Op:3  Filter:Select Gateway Name.**
 
-Introducir la Ip del host para realizar el filtrado en la búsqueda. 
+Introducir el nombre total o parcial del gateway para realizar el filtrado.
+
+Ej: FWCPD =FWCPD1,FWCPD2,FWCPD3 
+```
+Intro the Origin Gateway name to filter the search or use a pattern
+  Example: to get origin names fwcpd1 and fwcpd2 put:fwcpd
+Press intro to select any
+Gateway name : fwcpd
+```
+
+--------------------------------------------------------------------
+- *Op:4  Filter:Policy Name .**
+
+Introducir el nombre total o parcial de la política a filtrar
+
+Ej: fwint =policy_fwinterno
+```
+Intro the Policy name 
+Press intro to select any
+Policy Name : fwint
+```
+
+--------------------------------------------------------------------
+- *Op:5  Filter:Rule Id.**
+
+Introducir el numero de regla para aplicar en el filtrado
+
+Ej: Rule Id = 88
+```
+Intro the Rule Id 
+Press intro to select any
+Rule_id : 88
+```
+
+--------------------------------------------------------------------
+- *Op:6  Filter:Select Host.**
+
+Introducir la Ip o red del host para realizar el filtrado en la búsqueda. 
 
 El script obtendrá cualquier trafico logado con origen o destino a esta Ip.
 
@@ -119,20 +174,7 @@ host Ip : 10.
 ```
 
 --------------------------------------------------------------------
-- *Op:4  Nombre del cluster.**
-
-Introducir el nombre del cluster de los firewalls para realizar el filtrado.
-
-Ej: FWCPD =FWCPD1,FWCPD2,FWCPD3 
-```
-Intro the Origin cluster name to filter the search or use a pattern
-  Example: to get origin names fwcpd1 and fwcpd2 put:fwcpd
-Press intro to select any
-cluster name : FWCPD
-```
-
---------------------------------------------------------------------
-- *Op:5 Estado de la maquina.**
+- *Op:7 Machine Status.**
 
 Muestra estadísticas globales de uso de CPU, MEMORIA y DISCO. 
 
@@ -163,7 +205,7 @@ Size:6          Date:Jun 8 18:40      Name:/home/admin/find_log_tmp/find_log.pid
 
 
 --------------------------------------------------------------------
-- *Op:6 Ejecución.**
+- *Op:8 Execute.**
 
 Muestra los parámetros con los que va a realizar el filtrado, si se está de acuerdo, pulsar 'y'
 ```
@@ -171,18 +213,22 @@ Execute query command
 
 Selected Gateway: 10.0.0.1
 
-Selected Cluster name: fwcpd
+Selected Gateway name: any
+
+Selected Policy name: any
+
+Selected Rule Id: 88
 
 Selected Host: 10.
 
-Query example: fw log -npl -c accept -h 10.0.0.1 2020-04-01_000000.log | gawk 'BEGIN{FS=OFS=";";} {if ($6 ~ /src:/ && tolower($4) ~ tolower("fwcpd")) if($6 ~ /src: 10./ || $7 ~ /dst: 10./) {split($1,a," ") ; split($4,b,",") ; print a[6],substr( b[1], 1, length(b[1])-1 ),$6,$7,$8,$11,$16,$21}}' > /home/admin/find_log_tmp/fwcpd_10.0.0.1_10._2020-04-01_000000.flt
+Query example: fw log -npl -c accept -h 10.0.0.1 2020-06-14_000000.log | gawk 'BEGIN{FS=OFS=";";} { if ($6 ~ /src:/) { if($6 ~ /src: 10./ || $7 ~ /dst: 10./) if($11 == " match_id: 88") {split($1,a," ") ; split($4,b,",") ; print a[6],b[1],$6,$7,$8,$11,$16,$(NF-3),$13} } else { if($12 ~ / xlate/) if($9 ~ /src: 10./ || $10 ~ /dst: 10./) if($18 == " match_id: 88") {split($1,a," ") ; split($4,b,",") ; print a[6],b[1],$9,$10,$11,$18,$23,$(NF-5),$20} }}' > /home/find_log_tmp/any_any_10.882020-06-14_000000.flt
 
-Selected log files: 2020-04-01_000000.log
+Selected log files: 2020-06-14_000000.log 2020-06-15_000000.log 2020-06-16_000000.log 2020-06-17_000000.log 2020-06-18_000000.log fw.log
 
-Available Disk space: 58941 [MB]
-Approximate size need: 1502 [MB]
+Available Disk space: 33802 [MB]
+Approximate size need: 24 [MB]
 
-Are you sure? [y/N] :
+Are you sure? [y/N] :y
 ```
 
 Realizando el filtrado.
@@ -258,13 +304,15 @@ Se pueden pasar los parámetros de  filtrado directamente al script 'find_log_jo
 Usage:
     find_log_job -h                      Display this help message.
     [-n]                                   Host or net Ip.
-    [-c]                                   Cluster name.
+    [-c]                                   Gateway name.
     [-g]                                   Gateway Ip.
+    [-p]                                   Policy name
+    [-r]                                   Rule Id
     [-l]                                   Log files.
 
 
     Example:
-    find_log_job.sh -n 1.1.1.1 -c fwcpd -g 2.2.2.2 -l "2020-05-04_000000.log 2020-05-03_000000.log"
+    find_log_job.sh -n 1.1.1.1 -c fwcpd -g 2.2.2.2 -p Fw_Policy_secure -r 103 -l "2020-05-04_000000.log 2020-05-03_000000.log"
 ```
 
 

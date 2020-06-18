@@ -97,7 +97,7 @@ Si se quiere seleccionar un rango de ficheros, primero introducir el numero dond
 62) 2020-04-23_000000.log   124) Go back
 Select file: 123
 ____________________________________________
-Intro de file range
+Intro the file range
 id1-id2
 File Range : 114-119
 From :114    To :119

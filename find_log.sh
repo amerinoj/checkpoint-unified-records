@@ -11,7 +11,9 @@
 	Time_start=""
 	Select_Gateway="any"
 	Host_Ip="any"
-	Cluster_Name="any"
+	Gateway_Name="any"
+	Policy_Name="any"
+	Rule_Id="any"
 	Query_Command=""
 	declare -a Select_Files
 	declare -a Output_Files
@@ -76,6 +78,28 @@
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
 	}
 
+	select_Policy()
+	{
+		echo "Intro the Policy name "
+		echo "Press intro to select any"
+		read -p "Policy Name : " Policy_Name
+		if ! [ "$Policy_Name" ]; then
+			Policy_Name="any"
+		fi
+		echo -e "Policy Selected: \e[1m $Policy_Name \e[21m "
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+	}
+	select_rule_id()
+	{
+		echo "Intro the Rule Id "
+		echo "Press intro to select any"
+		read -p "Rule_id : " Rule_Id
+		if ! [ "$Rule_Id" ]; then
+			Rule_Id="any"
+		fi
+		echo -e "Rule Selected: \e[1m $Rule_Id \e[21m "
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+	}
 	select_host()
 	{
 		echo "Intro the host Ip to filter the search"
@@ -98,23 +122,23 @@
 	local Mem="$(free -m  | gawk 'BEGIN{FS=OFS=" ";} {if ($1 ~ /Mem:/) print "Mem in MB Total:"$2" Free:"$4}')"
 	#local C_Disk="$(df -H   | sort  -n -t ' ' -k6 |  tail -n +3)"
 	local L_Disk="$(df  -k $PWD -h  | sort  -n -t ' ' -k6 |  tail -n +2)"	
-	local Fsize="$(ls $Ls_path -hlt | cut -d" " -f5-20 | head -n 14 )"
+	local Fsize="$(ls $Ls_path -hlt | cut -d" " -f5-20 | head -n 11 )"
 
-	printf "\n######################## Global CPU ##########################\n\n"
+	printf "######################## Global CPU ##########################\n\n"
 	printf "Cpu:%-5s %-2s %% | Cpu:%-5s %-2s %% | Cpu:%-5s %-2s %% | Cpu:%-5s %-2s %%\n" $Cpu
 	printf "\n###################### Global Memory #########################\n\n"
 	printf "%s \n" "$Mem"
 	#printf "\n####################### Global Disk ##########################\n\n"
 	#printf "%s \n" "$C_Disk"	
 	printf "\n####################### Process view #########################\n\n"
-	printf "[Type]    PID           %%CPU        %%MEM        CMD\n"
+	printf "[Type]    PID    %%CPU    %%MEM    CMD\n"
 
 	for p in "${Child_Pid[@]}"; do
-		local Stat_Pid="$(ps  -p $p -o pid,%cpu,%mem,cmd | tail -n 1  | awk ' {print $1"         "$2"         "$3"         "$4" "$5" "$6" "$7" "$8" "$9" "$10" "$11}')"
+		local Stat_Pid="$(ps  -p $p -o pid,%cpu,%mem,cmd | tail -n 1  | gawk ' {print $1"    "$2"    "$3"    "$4" "$5" "$6" "$7" "$8" "$9" "$10" "$11" "$12" "$13" "$14" "$15}')"
 		if [[ $$ == $p ]] ; then
 			printf "[Ower]    %s \n" "$Stat_Pid"
 		else
-			if kill -0 $p ; then
+			if ps -p $p >/dev/null ; then
 				printf "[Chil]    %s \n" "$Stat_Pid"
 			else
 				printf "No Found :  %s no found\n" "$p"
@@ -124,20 +148,20 @@
 	printf "\n######################## Disk Use ############################\n\n"
 	printf "%s \n" "$L_Disk"
 	printf "_______________________________________________________________\n"
-	printf "Size:%-5s Date:%-2s %s %-5s Name:%-2s \n" $Fsize
+	printf "Size:%-4s Date:%-3s %s %-5s Name:%-2s \n" $Fsize
 
 	}
 
-	select_cluster()
+	select_G_Name()
 	{
-		echo "Intro the Origin cluster name to filter the search or use a pattern"
+		echo "Intro the Origin Gateway name to filter the search or use a pattern"
 		echo -e " \e[4m Example: to get origin names fwcpd1 and fwcpd2 put:fwcpd\e[24m"
 		echo "Press intro to select any"
-		read -p "cluster name : " Cluster_Name
-		if ! [ "$Cluster_Name" ]; then
-			Cluster_Name="any"
+		read -p "Gateway name : " Gateway_Name
+		if ! [ "$Gateway_Name" ]; then
+			Gateway_Name="any"
 		fi
-		echo -e  "Cluster Name:\e[1m $Cluster_Name\e[21m"
+		echo -e  "Gateway Name:\e[1m $Gateway_Name\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
 	}
 	by_by()
@@ -206,7 +230,6 @@
 		Hd_Av_size=$(df  -k $PWD   | sort  -n -t ' ' -k6 |  tail -n +3 | gawk 'BEGIN{FS=OFS=" ";} { print $3  }')
 		Hd_Av_size=$(($Hd_Av_size/1024))
 		Max_File_Size=$( ls --sort=size -l  $Log_Path*.log | head -n 1 | gawk 'BEGIN{FS=OFS=" ";} { print $5  }')
-		echo $Max_File_Size
 		Max_File_Size=$(($Max_File_Size/1024/1024))
 		
 		Reco_Size=$((${#Select_Files[@]}*2))
@@ -219,32 +242,69 @@
 
 		fi
 		
-		Query_Command_2="| gawk 'BEGIN{FS=OFS=\";\";} {if (\$6 ~ /src:/"
-		if [[ 'any' != $Cluster_Name ]]; then 
-			Query_Command_2="$Query_Command_2 && tolower(\$4) ~ tolower(\"$Cluster_Name\")) "
-		else
-			Query_Command_2="$Query_Command_2 )"
+		Query_Command_2="| gawk 'BEGIN{FS=OFS=\";\";} {"
+
+		if [[ 'any' != $Gateway_Name ]]; then 
+			Query_Command_2="$Query_Command_2 if ( tolower(\$4) ~ tolower(\"$Gateway_Name\")) "
 		fi
 
+		Query_Command_2="$Query_Command_2 if (\$6 ~ /src:/) {"
+
+		if [[ 'any' != $Policy_Name ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$13 ~ /layer_name:/ && tolower(\$13) ~ tolower(\"$Policy_Name\")) "
+		fi
+		
 		if [[ 'any' != $Host_Ip ]]; then 
 			Query_Command_2="$Query_Command_2 if(\$6 ~ /src: $Host_Ip/ || \$7 ~ /dst: $Host_Ip/)"
 		fi
 
+		if [[ 'any' != $Rule_Id ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$11 == \" match_id: $Rule_Id\") "
+		fi
+		
+		Query_Command_2="$Query_Command_2 {split(\$1,a,\" \") ; split(\$4,b,\",\") ; print a[6],b[1],\$6,\$7,\$8,\$11,\$16,\$(NF-3),\$13} }"
+		
+		Query_Command_2="$Query_Command_2  else { if(\$12 ~ / xlate/)"
 
-		Query_Command_2="$Query_Command_2 {split(\$1,a,\" \") ; split(\$4,b,\",\") ; print a[6],substr( b[1], 1, length(b[1])-1 ),\$6,\$7,\$8,\$11,\$16,\$21}}'  > "
+
+		if [[ 'any' != $Policy_Name ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$20 ~ /layer_name:/ && tolower(\$20) ~ tolower(\"$Policy_Name\")) "
+		fi
+		
+		if [[ 'any' != $Host_Ip ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$9 ~ /src: $Host_Ip/ || \$10 ~ /dst: $Host_Ip/)"
+		fi
+
+		if [[ 'any' != $Rule_Id ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$18 == \" match_id: $Rule_Id\") "
+		fi
+		
+		Query_Command_2="$Query_Command_2 {split(\$1,a,\" \") ; split(\$4,b,\",\") ; print a[6],b[1],\$9,\$10,\$11,\$18,\$23,\$(NF-5),\$20} }"
+		
+		Query_Command_2="$Query_Command_2}'  > "
+
 
 		filename=$(echo "${Select_Files[0]}" | cut -f 1 -d '.')
-		filename="${Tmp_dir}${Cluster_Name}_${Select_Gateway}_${Host_Ip}_${filename}"
+		filename="${Tmp_dir}${Gateway_Name}_${Policy_Name}_${Host_Ip}${Rule_Id}${filename}"
 		Query_Command="$Query_Command_1 ${Select_Files[0]} ${Query_Command_2} ${filename}.flt"
 		
 		echo -e "\e[5mExecute query command\e[25m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"			
 		echo -e "Selected Gateway: \e[1m"$Select_Gateway"\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
-		echo -e "Selected Cluster name: \e[1m"$Cluster_Name"\e[21m"
-		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"			
+		
+		echo -e "Selected Gateway name: \e[1m"$Gateway_Name"\e[21m"
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"	
+
+		echo -e "Selected Policy name: \e[1m"$Policy_Name"\e[21m"
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+
+		echo -e "Selected Rule Id: \e[1m"$Rule_Id"\e[21m"
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+		
 		echo -e "Selected Host: \e[1m"$Host_Ip"\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+		
 		echo -e "Query example: \e[1m"$Query_Command"\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"		
 		echo -e "Selected log files: ""${Select_Files[@]]}"
@@ -267,7 +327,7 @@
 		clear
 		Time_end=$(date +%s)
 		DIFF=$(( $Time_end - $T_start ))
-		echo "Execution time:[ $(($DIFF / 60)) minutes $(($DIFF % 60)) seconds]"
+		echo "                Execution time:[ $(($DIFF / 60)) minutes $(($DIFF % 60)) seconds]"
 		machine_status "$File_ls"
 		sleep 5 
 	done
@@ -287,8 +347,6 @@
 		if ! [ -z "$subproces" ];then
 			Child_Pid+=($subproces)				
 			process_tree $subproces
-		else
-			process_tree $$
 		fi
 	}
 		
@@ -318,13 +376,14 @@
 	IFS=$'\n'
 	choices=($hsopt)
 	choices+=('All')
+	choices+=('Range')
 	choices+=('Go back')
 	IFS=$oldIFS
 	PS3="Select file: "
 	select answer in "${choices[@]}"; do
 		for item in "${choices[@]}"; do
 		   if [[ $item == $answer ]]; then
-				if  [[ 'Go back' == $answer ]] || [[ 'All' == $answer ]]; then
+				if  [[ 'Go back' == $answer ]] || [[ 'All' == $answer ]] ; then
 					if [[ 'All' == $answer ]]; then
 						unset Select_Files
 						Select_Files=($Logs)
@@ -332,17 +391,38 @@
 					fi
 					break 2;
 				else
-					if [[ " ${Select_Files[@]} " =~ " ${answer} " ]]; then
-						echo "Log file previusly selected"
+					if [[ 'Range' == $answer ]]; then
+						echo "____________________________________________"
+						echo "Intro de file range"
+						echo "id1-id2"
+						read -p "File Range : " Range_File
+						if [[ ${Range_File} == *"-"* ]]; then
+							from=$(echo ${Range_File}| cut -d'-' -f1)
+							to=$(echo ${Range_File}| cut -d'-' -f2)
+							echo "From :$from    To :$to"
+							for i in "${!choices[@]}"; do
+								if (("$i"+1 >= "$from" )) && (("$i"+1 <= "$to")) ;then  
+									Select_Files+=(${choices[$i]})
+								fi
+							done
+							
+							echo "Files: ${Select_Files[@]}"
+						fi
 					else
-						Select_Files+=($answer)
-						echo "Files: ${Select_Files[@]}"
-		
+						if [[ " ${Select_Files[@]} " =~ " ${answer} " ]]; then
+							echo "Log file previusly selected"
+						else
+							Select_Files+=($answer)
+							echo "Files: ${Select_Files[@]}"
+			
+						fi
 					fi
 
 				fi 
-				
+
 		   fi
+		   
+		   
 		done
 	done
 
@@ -390,7 +470,7 @@
 			echo -e  "\e[1mInstance find_log_job PID:$subproces\e[21m"
 			echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
 			
-			read -r -p "Do you want take the control? [y/N] :" response
+			read -r -p "Do you want to take the control? [y/N] :" response
 			case "$response" in
 				[yY][eE][sS]|[yY]) 
 				
@@ -420,7 +500,7 @@
 		echo ""
 		printf "\n####################  Menu  options  ####################\n\n"
 		PS3='Options: '
-		options=("Filter:Select Files" "Filter:Select Gateway" "Filter:Select Host" "Filter:Select Cluster" "Machine Status" "Execute" "End")
+		options=("Filter:Select Files" "Filter:Select Gateway Ip" "Filter:Select Gateway Name" "Filter:Policy Name" "Filter:Rule Id" "Filter:Select Host"  "Machine Status" "Execute" "End")
 		select Opt in "${options[@]}"
 		do
 		   case $Opt in
@@ -432,13 +512,34 @@
 			 break
 			 ;;
 			 
-			"Filter:Select Gateway")
+			"Filter:Select Gateway Ip")
 				clear
 				select_gateway
 				sleep 2
 				clear
 			 break
 			 ;;
+			"Filter:Select Gateway Name") 
+				clear
+				select_G_Name
+				sleep 2
+				clear
+			 break
+			 ;;
+			"Filter:Policy Name") 
+				clear
+				select_Policy
+				sleep 2
+				clear
+			 break
+			 ;;		
+			"Filter:Rule Id") 
+				clear
+				select_rule_id
+				sleep 2
+				clear
+			 break
+			 ;;			 
 			"Filter:Select Host") 
 				clear
 				select_host
@@ -446,13 +547,7 @@
 				clear
 			 break
 			 ;;
-			"Filter:Select Cluster") 
-				clear
-				select_cluster
-				sleep 2
-				clear
-			 break
-			 ;;
+
 			 
 			"Machine Status") 
 				clear
@@ -496,14 +591,17 @@
 
 	########launch query job
 	
-	
+	log_file_string=""
 	for i in "${!Select_Files[@]}"; do 
 		log_file_string="$log_file_string ${Select_Files[$i]}"
 	done
-	Command="sh $Job -n $Host_Ip -c $Cluster_Name  -l \" $log_file_string  \" "
+	Command="sh $Job -n $Host_Ip -c $Gateway_Name -g $Select_Gateway -r $Rule_Id -p $Policy_Name -l \" $log_file_string \" "
 	eval $Command &
-	
 	subproces=$!
+	
+	Command="disown -h $subproces"
+	eval $Command
+	
 	Child_Pid+=($subproces)	
 	process_tree $subproces
 	show_job_status $subproces
@@ -514,7 +612,7 @@
 	Time_end=$(date +%s)
 	DIFF=$(( $Time_end - $Time_start ))
 	
-	EndFile="${Tmp_dir}${Cluster_Name}_${Select_Gateway}_${Host_Ip}_$(date '+%Y_%m_%d')"
+	EndFile="${Tmp_dir}${Gateway_Name}_${Policy_Name}_${Host_Ip}${Rule_Id}$(date '+%Y_%m_%d')"
 	echo "---------------------------------------------------------------"
 	echo "Execution time: $(($DIFF / 60)) minutes $(($DIFF % 60)) seconds"
 	echo "---------------------------------------------------------------"	

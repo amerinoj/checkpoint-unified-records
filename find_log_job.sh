@@ -1,5 +1,5 @@
 #!/bin/bash +x
-set -e
+#set -e
 
 Pid_find_log_job="find_log_job.pid"
 declare -a Select_Files
@@ -7,10 +7,13 @@ declare -a Output_Files
 Query_Command=""
 Select_Gateway="any"
 Host_Ip="any"
-Cluster_Name="any"
+Policy_Name="any"	
+Gateway_Name="any"
+Rule_Id="any"
 Tmp_dir="find_log_tmp/"	
-Dns_server1=""	
-Dns_server2=""	
+Dns_server1="89.1.0.101"	
+Dns_server2="2.2.0.101"
+
 
 	create_temp_dir()
 	{
@@ -57,7 +60,9 @@ Dns_server2=""
 		if [[ $$ == $(head -n 1 "$Tmp_dir$Pid_find_log_job") ]] ;then
 			$(rm "$Tmp_dir$Pid_find_log_job" )
 		fi
-
+		
+		trap - EXIT TERM INT
+		exit 2
 	}
 
 
@@ -88,20 +93,22 @@ Dns_server2=""
 	{
 		unset Output_Files
 		for i in "${!Select_Files[@]}"; do 
-			echo "Filtering file ${Select_Files[$i]} "
-			filename=$(echo "${Select_Files[$i]}" | cut -f 1 -d '.')
-			filename="${Tmp_dir}${Cluster_Name}_${Select_Gateway}_${Host_Ip}_${filename}"
-			Output_Files+=($filename)
-			Query_Command="$Query_Command_1 ${Select_Files[$i]} ${Query_Command_2} ${filename}.flt "
-			eval $Query_Command
+			if ! [ -z "${Select_Files[$i]}" ];then
+				echo "Filtering file ${Select_Files[$i]} "
+				filename=$(echo "${Select_Files[$i]}" | cut -f 1 -d '.')
+				filename="${Tmp_dir}${Gateway_Name}_${Policy_Name}_${Host_Ip}${Rule_Id}${filename}"
+				Output_Files+=($filename)
+				Query_Command="$Query_Command_1 ${Select_Files[$i]} ${Query_Command_2} ${filename}.flt "
+				eval $Query_Command
 
-			echo "Trying to unifying records for ${filename}.flt "
-			Command="sort  ${filename}.flt  | uniq > ${filename}.unq"
-			eval $Command
-			
-			echo "Removing flt file: ${filename}.flt "
-			Command="rm  ${filename}.flt "
-			eval $Command	
+				echo "Trying to unifying records for ${filename}.flt "
+				Command="gawk 'BEGIN{FS=OFS=\";\";} {a[\$0]++}END{for(i in a){print i,a[i]}}' ${filename}.flt > ${filename}.unq"
+				eval $Command
+				
+				echo "Removing flt file: ${filename}.flt "
+				Command="rm  ${filename}.flt "
+				eval $Command	
+			fi
 				
 		done
 		echo ""
@@ -109,7 +116,8 @@ Dns_server2=""
 		echo ""
 		
 		echo "Unifying files ..."
-		EndFile="${Tmp_dir}${Cluster_Name}_${Select_Gateway}_${Host_Ip}_$(date '+%Y_%m_%d')"
+		
+		EndFile="${Tmp_dir}${Gateway_Name}_${Policy_Name}_${Host_Ip}${Rule_Id}$(date '+%Y_%m_%d')"
 
 		for i in "${!Output_Files[@]}"; do 
 			echo "Using file ${Output_Files[$i]}.tmp "
@@ -125,7 +133,7 @@ Dns_server2=""
 		echo ""
 		
 		echo "Trying to sort and remove duplicates in EndFile ${EndFile}.tmp  "
-		Command="sort  ${EndFile}.tmp  | uniq  > ${EndFile}.csv"
+		Command="gawk 'BEGIN{FS=OFS=\";\";} {a[\$1\$2\$3\$4\$5\$6\$7\$8\$9] += \$10} END{for (i in a) print i," Hits: \"a[i]}'  ${EndFile}.tmp > ${EndFile}.csv"
 		eval $Command
 
 		echo "Removing tmp file:  ${EndFile}.tmp"
@@ -153,22 +161,50 @@ Dns_server2=""
 
 		fi
 		
-		Query_Command_2="| gawk 'BEGIN{FS=OFS=\";\";} {if (\$6 ~ /src:/"
-		if [[ 'any' != $Cluster_Name ]]; then 
-			Query_Command_2="$Query_Command_2 && tolower(\$4) ~ tolower(\"$Cluster_Name\")) "
-		else
-			Query_Command_2="$Query_Command_2 )"
+		Query_Command_2="| gawk 'BEGIN{FS=OFS=\";\";} {"
+
+		if [[ 'any' != $Gateway_Name ]]; then 
+			Query_Command_2="$Query_Command_2 if ( tolower(\$4) ~ tolower(\"$Gateway_Name\")) "
 		fi
 
+		Query_Command_2="$Query_Command_2 if (\$6 ~ /src:/) {"
+
+		if [[ 'any' != $Policy_Name ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$13 ~ /layer_name:/ && tolower(\$13) ~ tolower(\"$Policy_Name\")) "
+		fi
+		
 		if [[ 'any' != $Host_Ip ]]; then 
 			Query_Command_2="$Query_Command_2 if(\$6 ~ /src: $Host_Ip/ || \$7 ~ /dst: $Host_Ip/)"
 		fi
 
+		if [[ 'any' != $Rule_Id ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$11 == \" match_id: $Rule_Id\") "
+		fi
+		
+		Query_Command_2="$Query_Command_2 {split(\$1,a,\" \") ; split(\$4,b,\",\") ; print a[6],b[1],\$6,\$7,\$8,\$11,\$16,\$(NF-3),\$13} }"
+		
+		Query_Command_2="$Query_Command_2  else { if(\$12 ~ / xlate/)"
 
-		Query_Command_2="$Query_Command_2 {split(\$1,a,\" \") ; split(\$4,b,\",\") ; print a[6],substr( b[1], 1, length(b[1])-1 ),\$6,\$7,\$8,\$11,\$16,\$21}}'  > "
+
+		if [[ 'any' != $Policy_Name ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$20 ~ /layer_name:/ && tolower(\$20) ~ tolower(\"$Policy_Name\")) "
+		fi
+		
+		if [[ 'any' != $Host_Ip ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$9 ~ /src: $Host_Ip/ || \$10 ~ /dst: $Host_Ip/)"
+		fi
+
+		if [[ 'any' != $Rule_Id ]]; then 
+			Query_Command_2="$Query_Command_2 if(\$18 == \" match_id: $Rule_Id\") "
+		fi
+		
+		Query_Command_2="$Query_Command_2 {split(\$1,a,\" \") ; split(\$4,b,\",\") ; print a[6],b[1],\$9,\$10,\$11,\$18,\$23,\$(NF-5),\$20} }"
+		
+		Query_Command_2="$Query_Command_2}'  > "
+
 
 		filename=$(echo "${Select_Files[0]}" | cut -f 1 -d '.')
-		filename="${Tmp_dir}${Cluster_Name}_${Select_Gateway}_${Host_Ip}_${filename}"
+		filename="${Tmp_dir}${Gateway_Name}_${Policy_Name}_${Host_Ip}${Rule_Id}${filename}"
 		Query_Command="$Query_Command_1 ${Select_Files[0]} ${Query_Command_2} ${filename}.flt"
 
 		echo -e "Query: \e[1m"$Query_Command"\e[21m"
@@ -181,19 +217,21 @@ Dns_server2=""
 ########### MAIN ####################
 
 # Parse options to 
-while getopts "hl:n:c:g:" opt; do
+while getopts "hl:n:c:g:p:r:" opt; do
   case ${opt} in
 	h )
 		echo "Usage:"
 		echo "    find_log_job -h                      Display this help message."
 		echo "    [-n]                      		   Host or net Ip."	
-		echo "    [-c]                      		   Cluster name."
+		echo "    [-c]                      		   Gateway name."
 		echo "    [-g]                      		   Gateway Ip."
+		echo "    [-p]                      		   Policy name"	
+		echo "    [-r]                      		   Rule Id"	
 		echo "    [-l]                      		   Log files."	
 		echo ""
 		echo ""		
 		echo "    Example:" 	
-		echo "    find_log_job.sh -n 1.1.1.1 -c fwcpd -g 2.2.2.2 -l \"2020-05-04_000000.log 2020-05-03_000000.log\""
+		echo "    find_log_job.sh -n 1.1.1.1 -c fwcpd -g 2.2.2.2 -p Fw_Policy_secure -r 103 -l \"2020-05-04_000000.log 2020-05-03_000000.log\""
 		echo ""
 		exit 0
 	  ;;
@@ -215,6 +253,18 @@ while getopts "hl:n:c:g:" opt; do
 		echo -e  "Select host: \e[1m"$Host_Ip"\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
 	;; 
+	p )
+		Policy_Name="$OPTARG"
+		echo -e  "-------------------------------------"
+		echo -e  "Policy: \e[1m"$Policy_Name"\e[21m"
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+	;; 
+	r )
+		Rule_Id="$OPTARG"
+		echo -e  "-------------------------------------"
+		echo -e  "Rule id: \e[1m"$Rule_Id"\e[21m"
+		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
+	;; 
 	l )
 		IFS=' ' read -r -a Select_Files <<< "$OPTARG"
 		echo -e  "-------------------------------------"
@@ -229,7 +279,6 @@ while getopts "hl:n:c:g:" opt; do
 done
 
 
-
 if [ -z "$Select_Files" ];then
 	echo "At least the log name files sould be pass as argument"
 	exit 1
@@ -237,7 +286,7 @@ fi
 
 echo " My Pid: "$$""
 echo ""
-trap by_by EXIT 
+trap by_by SIGINT
 
 create_temp_dir
 

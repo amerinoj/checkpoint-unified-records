@@ -227,7 +227,7 @@
 	show_query_example()
 	{
 	
-		Hd_Av_size=$(df  -k $PWD   | sort  -n -t ' ' -k6 |  tail -n +3 | gawk 'BEGIN{FS=OFS=" ";} { print $3  }')
+		Hd_Av_size=$(df  -k $PWD   | sort  -n -t ' ' -k6 |  tail -n +2 | gawk 'BEGIN{FS=OFS=" ";} { print $3  }')
 		Hd_Av_size=$(($Hd_Av_size/1024))
 		Max_File_Size=$( ls --sort=size -l  $Log_Path*.log | head -n 1 | gawk 'BEGIN{FS=OFS=" ";} { print $5  }')
 		Max_File_Size=$(($Max_File_Size/1024/1024))

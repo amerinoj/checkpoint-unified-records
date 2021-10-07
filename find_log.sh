@@ -307,7 +307,7 @@
 		
 		echo -e "Query example: \e[1m"$Query_Command"\e[21m"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"		
-		echo -e "Selected log files: ""${Select_Files[@]]}"
+		echo -e "Selected log files: ${Select_Files[@]}"
 		echo -e "\e[25m\e[21m\e[22m\e[24m\e[25m\e[27m\e[28m"
 		
 		echo -e "Available Disk space: \e[1m"$Hd_Av_size" [MB]\e[21m"
@@ -595,7 +595,7 @@
 	for i in "${!Select_Files[@]}"; do 
 		log_file_string="$log_file_string ${Select_Files[$i]}"
 	done
-	Command="sh $Job -n $Host_Ip -c $Gateway_Name -g $Select_Gateway -r $Rule_Id -p $Policy_Name -l \" $log_file_string \" "
+	Command="nohup sh $Job -n $Host_Ip -c $Gateway_Name -g $Select_Gateway -r $Rule_Id -p $Policy_Name -l \" $log_file_string \" "
 	eval $Command &
 	subproces=$!
 	

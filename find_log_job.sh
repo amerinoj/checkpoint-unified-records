@@ -178,7 +178,7 @@ Dns_server2=""
                 if [[ 'any' != $Rule_Id ]]; then
                         Query_Command_2="$Query_Command_2 &&  M  ~  /$Rule_Id/ "
                 fi
-
+				
                 Query_Command_2="$Query_Command_2 ) print O[1],\$8,\$7,S,D,P,SV,M,L}"
 
                 Query_Command_2="$Query_Command_2 '  > "
@@ -287,4 +287,5 @@ fi
 
 make_query_command
 Query_Job
+
 

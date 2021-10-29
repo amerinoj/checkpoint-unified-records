@@ -1,4 +1,4 @@
-	        #!/bin/bash +x
+        #!/bin/bash +x
         set -e
 
         Log_Path=$FWDIR/log/
@@ -243,7 +243,7 @@
                 fi
 
                 Query_Command_2="| gawk 'BEGIN{FS=OFS=\";\";}  {S=D=P=SV=M=L=\"0\";for (I=1;I<NF;I++){if(\$I ~ / src:/ ){S=\$I};if(\$I ~ / dst:/){D=\$I};if(\$I ~ / proto:/){P=\$I};if(\$I ~ / svc:/){SV=\$I};if(\$I ~ / match_id:/){M=\$I};if(\$I ~ / layer_name:/){L=\$I};} split(\$14,O,\",\") ;if(\$7 ==\" Action: accept\" "
-
+				
                 if [[ 'any' != $Gateway_Name ]]; then
                         Query_Command_2="$Query_Command_2 && O[1]  ~  /$Gateway_Name/ "
                 fi
@@ -259,7 +259,7 @@
                 if [[ 'any' != $Rule_Id ]]; then
                         Query_Command_2="$Query_Command_2 &&  M  ~  /$Rule_Id/ "
                 fi
-
+				
                 Query_Command_2="$Query_Command_2 ) print O[1],\$8,\$7,S,D,P,SV,M,L}"
 
                 Query_Command_2="$Query_Command_2 '  > "
@@ -600,4 +600,7 @@
         echo "Done ..."
         echo "Final file : ${EndFile}.csv "
         echo "---------------------------------------------------------------"
+
+
+
 
